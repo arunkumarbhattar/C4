@@ -39,6 +39,10 @@ int main(int argc, char** argv ) {
 
 C3 does not attempt to parse the full Checked C grammar. It parses just enough of the grammar to identify contextual uses of Checked C idioms, and converts them to their C equivalents. It is built using [ocamllex](https://ocaml.org/manual/lexyacc.html) and [menhir](http://gallium.inria.fr/~fpottier/menhir/).
 
+# Setup
+
+Set up opam (see `opam init --help`), then run `opam install dune menhir` to install the OCaml dependencies. Make sure that regular (non Checked C) `clang` is on your `$PATH`.
+
 # Running, Examples
 
 The following runs the above example:
