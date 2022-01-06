@@ -41,7 +41,7 @@ C3 does not attempt to parse the full Checked C grammar. It parses just enough o
 
 # Setup
 
-Set up opam (see `opam init --help`), then run `opam install dune menhir` to install the OCaml dependencies. Make sure that regular (non Checked C) `clang` is on your `$PATH`.
+Set up opam (see `opam init --help`), then run `opam install --deps-only .` to install the OCaml dependencies. Make sure that regular (non Checked C) `clang` is on your `$PATH`.
 
 # Running, Examples
 
