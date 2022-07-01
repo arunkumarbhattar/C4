@@ -6,6 +6,7 @@
 %token PTR
 %token TSTRUCT
 %token <string> TSTRUCT_str "Tstruct"
+%token TAINTED
 %token TPTR
 %token <int * int> COLONBOUNDS
 %token <int * int> COLONITYPE
@@ -21,10 +22,63 @@
 %token FORANY
 %token COLON
 %token COMMA
+%token GIJOE
 %token CHECKED
 %token DYNCHECK
 %token ASSUME_CAST
 %token TASSUME_CAST
+(*
+        stdlib_tainted.h
+*)
+
+%token TATOF
+%token TATOI
+%token TATOL
+%token TATOLL
+%token TSTRTOD
+%token TSTRTOF
+%token TSTRTOLD
+%token TSTRTOL
+%token TSTRTOLL
+%token TSTRTOUL
+%token TSTRTOULL
+%token TALIGNEDALLOC
+%token TFREE
+%token TATEXIT
+%token TATQUICKEXIT
+%token TSYSTEM
+%token TBSEARCH
+%token TGETENV
+%token TQSORT
+%token TMBLEN
+%token TMBTOWC
+%token TMBSTOWCS
+%token TWCSTOMBS
+%token TMALLOC
+%token TREALLOC
+%token TSPRINTFCHKCBX
+(*
+        _builtin_common_tainted.cpp
+*)
+%token TBUILTINOBJECTSIZE
+(*
+        _builtin_stdio_tainted.h
+*)
+%token TBUILTINSPRINTFCHK
+%token TSNPRINTFCHK
+%token TBUILTINSNPRINTFCHK
+%token TBUILTINVSPRINTFCHK
+%token TVSNNPRINTFCHK
+%token TBUILTINVSNPRINTFCHK
+%token TFRINTFCHK
+%token TBUILTINFPRINTFCHK
+%token TPRINTFCHK
+%token TBUILTINPRINTFCHK
+%token TVSPRINTFCHK
+%token TVFPRINTFCHK
+%token TBUILTINVFPRINTFCHK
+%token TBULTINVPRINTFCHK
+%token TPRINTF
 %start <(int*int*string) list> main
 
 %%
@@ -33,7 +87,6 @@ main:
 | p = checkedptr m = main { ($startpos.pos_cnum , $endpos(p).pos_cnum, p)::m }
 | p = cast m = main { ($startpos.pos_cnum , $endpos(p).pos_cnum, p)::m }
 | p = annot m = main { p::m }
-| TSTRUCT m = main {m}
 | LPAREN m = main { m }
 | RPAREN m = main { m }
 | LANGLE m = main { m }
@@ -66,7 +119,7 @@ expr:
 | c = ID { c }
 
 tstruct:
-| TSTRUCT { ($startpos.pos_cnum, $endpos.pos_cnum, "struct") }
+| TPTR LANGLE TSTRUCT s = tstruct RANGLE {String.concat "" ["*"; s ]}
 
 exprcomma:
 | LPAREN e = exprcomma* RPAREN { (String.concat "" ("("::e))^")" }
@@ -90,7 +143,11 @@ instvar:
 annot:
 /* add INCLUDE here; remove _checked, drop stdchecked.h (and note it in lexer) */
 | CHECKED { ($startpos.pos_cnum, $endpos.pos_cnum, "") }
+| TAINTED { ($startpos.pos_cnum, $endpos.pos_cnum, "")}
+| TMALLOC { ($startpos.pos_cnum, $endpos.pos_cnum, "malloc")}
 | TSTRUCT { ($startpos.pos_cnum, $endpos.pos_cnum, "struct") }
+| TSPRINTFCHKCBX {($startpos.pos_cnum, $endpos.pos_cnum, "__sprintf_chkcbx")}
+| TPRINTF {($startpos.pos_cnum, $endpos.pos_cnum, "printf")}
 | p = PRAGMA { let (s,e) = p in (s, e, "") }
 | DYNCHECK LPAREN insidebounds* RPAREN { ($startpos.pos_cnum, $endpos.pos_cnum, "") }
 | FORANY LPAREN t = ID RPAREN { note_tyvar t; ($startpos.pos_cnum, $endpos.pos_cnum, "") }
@@ -134,6 +191,7 @@ checkedptr:
 | PTR LANGLE fp = fpointer RANGLE 
   { let (ret,params) = fp in String.concat "" [ret; "(*"; ")"; params] }
 | TPTR LANGLE p = checkedptr RANGLE { String.concat "" [p; " *"] }
+| TPTR LANGLE s = tstruct RANGLE {String.concat "" [s; "*"]}
 | TPTR LANGLE s = insideptr RANGLE { String.concat "" [s; " *"]}
 | TPTR LANGLE fp = fpointer RANGLE name = id_or_pid
   { let (ret,params) = fp in String.concat "" [ret; "(*"; name; ")"; params] }
@@ -174,6 +232,7 @@ qualed_type:
 | c = checkedptr { c }
 
 insideptr:
+| TSTRUCT s = ID { String.concat "" ["struct " ; s]}
 | c = ANY s = insideptr { String.concat "" [c; s]}
 (* This is not properly capturing whitespace: it assumes there's a space between tokens, but that's not necessarily so. Need to fix lexer.  *)
 | c = ID s = insideptr { let t = if is_tyvar c then "void" else c in String.concat " " [t; s] }

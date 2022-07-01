@@ -42,7 +42,7 @@ annot:
     { if b then Some ($startpos.pos_cnum, $endpos.pos_cnum, "") else None }
 | COLON itype bounds*
     { Some ($startpos.pos_cnum, $endpos.pos_cnum, "") }
-
+| TSPRINTFCHKCBX {($startpos.pos_cnum, $endpos.pos_cnum, "__sprintf_chkcbx")}
 
 bounds:
 | k = ID LPAREN insidebounds* RPAREN { k = "count" || k = "bounds" || k = "byte_count"  }

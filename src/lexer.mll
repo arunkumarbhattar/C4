@@ -1,8 +1,6 @@
 {
-
   open Parser
   open Hack
-     
   exception Error of string
 
 (* NOTE: More keywords here https://github.com/correctcomputation/checkedc/blob/master/include/stdchecked.h *)
@@ -18,6 +16,7 @@
 #define tarray_ptr _TArray_ptr
 #define tnt_array_ptr _TNt_array_ptr
 #define checked _Checked
+#define tainted _Tainted
 #define nt_checked _Nt_checked
 #define unchecked _Unchecked
 #define bounds_only _Bounds_only
@@ -31,6 +30,58 @@
  *)
 
   let brace_depth = ref None
+
+    let create_hashtable size init =
+        let tbl = Hashtbl.create size in
+        List.iter (fun (key, data) -> Hashtbl.add tbl key data) init;
+        tbl
+
+    let keyword_table =
+        create_hashtable 100 [
+                ("t_atof", TATOF);
+                ("t_atoi" ,TATOI);
+                ( "t_atol" , TATOL);
+                ( "t_atoll" , TATOLL);
+                ( "t_strtod" , TSTRTOD);
+                ( "t_strtof" , TSTRTOF);
+                ( "t_strtold" , TSTRTOLD);
+                ( "t_strtol" , TSTRTOL);
+                ( "t_strtoll" , TSTRTOLL);
+                ( "t_strtoul" , TSTRTOUL);
+                ( "t_strtoull" , TSTRTOULL);
+                ( "t_aligned_alloc" , TALIGNEDALLOC);
+                ("__t_sprintf_chkcbx", TSPRINTFCHKCBX);
+                ( "t_free" , TFREE);
+                ( "t_getenv" , TGETENV);
+                ( "t_atexit" , TATEXIT);
+                ( "t_atquick_exit" , TATQUICKEXIT);
+                ( "t_system" , TSYSTEM);
+                ( "t_bsearch" , TBSEARCH);
+                ( "t_qsort" , TQSORT);
+                ( "t_mblen" , TMBLEN);
+                ( "t_mbtowc" , TMBTOWC);
+                ( "t_mbstowcs" , TMBSTOWCS);
+                ( "t_wcstombs" , TWCSTOMBS);
+                ( "t_malloc" , TMALLOC);
+                ( "t_realloc" , TREALLOC);
+                ( "__t_builtin_object_size" , TBUILTINOBJECTSIZE);
+                ( "__t_builtin___sprintf_chk" , TBUILTINSPRINTFCHK);
+                ( "__t_snprintf_chk" , TSNPRINTFCHK);
+                ( "__t_builtin___snprintf_chk" , TBUILTINSNPRINTFCHK);
+                ( "__t_vsprintf_chk" , TVSPRINTFCHK);
+                ( "__t_builtin___vsprintf_chk" , TBUILTINVSPRINTFCHK);
+                ( "__t_vsnprintf_chk" , TVSNNPRINTFCHK);
+                ( "__t_builtin___vsnprintf_chk" , TBUILTINVSNPRINTFCHK);
+                ( "__t_fprintf_chk" , TFRINTFCHK);
+                ( "__t_builtin___fprintf_chk" , TBUILTINFPRINTFCHK);
+                ( "__t_printf_chk" , TPRINTFCHK);
+                ( "t_printf" , TPRINTF);
+                ( "__t_builtin___printf_chk" , TBUILTINPRINTFCHK);
+                ( "__t_vfprintf_chk" , TVFPRINTFCHK);
+                ( "__t_builtin___vfprintf_chk" , TBUILTINVFPRINTFCHK);
+                ( "__t_builtin___vprintf_chk" , TBULTINVPRINTFCHK);
+        ]
+
 }
 
 let id = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
@@ -55,13 +106,23 @@ rule keyword = parse
 | "_TPtr" | "_TArray_ptr" | "_TNt_array_ptr" { TPTR }
 | "Tstruct" { TSTRUCT}
 | "_Checked" | "_Unchecked" | "_Nt_checked" { CHECKED }
+| "_Tainted" {TAINTED}
+| ['_' 'A'-'Z' 'a'-'z']['_' 'A'-'Z' 'a'-'z' '0'-'9' '_']* as word
+               {
+                  try
+	       		    let token = Hashtbl.find keyword_table word in
+	       		    Printf.fprintf stderr "Token being parsed: %s!\n" word;
+	       		    token
+                    with Not_found ->
+                    ID word
+		}
 | "_Dynamic_check" { DYNCHECK }
 | "_Assume_bounds_cast" | "_Dynamic_bounds_cast" { ASSUME_CAST }
 | "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast" { TASSUME_CAST }
 (* Shorthands -- could limit only if !stdchecked, but won't work if not directly included *)
 | "ptr" | "array_ptr" | "nt_array_ptr" { if !stdchecked then PTR else ID(Lexing.lexeme lexbuf) }
 | "tptr" | "tarray_ptr" | "tnt_array_ptr" { if !stdcheckcbox then TPTR else ID(Lexing.lexeme lexbuf) }
-| "tstruct" { if !stdcheckcbox then TSTRUCT else ID(Lexing.lexeme lexbuf) }
+| "Tstruct" { if !stdcheckcbox then TSTRUCT else ID(Lexing.lexeme lexbuf) }
 | "checked" | "unchecked" | "nt_checked" {if !stdcheckcbox then CHECKED else ID(Lexing.lexeme lexbuf) }
 | "dynamic_check" { if !stdchecked then DYNCHECK else ID(Lexing.lexeme lexbuf) }
 | "assume_bounds_cast" | "dynamic_bounds_cast" { if !stdchecked then ASSUME_CAST else ID(Lexing.lexeme lexbuf) }
