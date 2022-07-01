@@ -6,6 +6,7 @@
 %token PTR
 %token TSTRUCT
 %token <string> TSTRUCT_str "Tstruct"
+%token TAINTED
 %token TPTR
 %token <int * int> COLONBOUNDS
 %token <int * int> COLONITYPE
@@ -25,6 +26,7 @@
 %token DYNCHECK
 %token ASSUME_CAST
 %token TASSUME_CAST
+%token TMALLOC
 %start <(int*int*string) list> main
 
 %%
@@ -66,7 +68,7 @@ expr:
 | c = ID { c }
 
 tstruct:
-| TSTRUCT { ($startpos.pos_cnum, $endpos.pos_cnum, "struct") }
+| TPTR LANGLE TSTRUCT s = tstruct RANGLE {String.concat "" ["*"; s ]}
 
 exprcomma:
 | LPAREN e = exprcomma* RPAREN { (String.concat "" ("("::e))^")" }
@@ -90,6 +92,8 @@ instvar:
 annot:
 /* add INCLUDE here; remove _checked, drop stdchecked.h (and note it in lexer) */
 | CHECKED { ($startpos.pos_cnum, $endpos.pos_cnum, "") }
+| TAINTED { ($startpos.pos_cnum, $endpos.pos_cnum, "")}
+| TMALLOC { ($startpos.pos_cnum, $endpos.pos_cnum, "malloc")}
 | TSTRUCT { ($startpos.pos_cnum, $endpos.pos_cnum, "struct") }
 | p = PRAGMA { let (s,e) = p in (s, e, "") }
 | DYNCHECK LPAREN insidebounds* RPAREN { ($startpos.pos_cnum, $endpos.pos_cnum, "") }
@@ -134,6 +138,7 @@ checkedptr:
 | PTR LANGLE fp = fpointer RANGLE 
   { let (ret,params) = fp in String.concat "" [ret; "(*"; ")"; params] }
 | TPTR LANGLE p = checkedptr RANGLE { String.concat "" [p; " *"] }
+| TPTR LANGLE s = tstruct RANGLE {String.concat "" [s; "*"]}
 | TPTR LANGLE s = insideptr RANGLE { String.concat "" [s; " *"]}
 | TPTR LANGLE fp = fpointer RANGLE name = id_or_pid
   { let (ret,params) = fp in String.concat "" [ret; "(*"; name; ")"; params] }
@@ -174,6 +179,7 @@ qualed_type:
 | c = checkedptr { c }
 
 insideptr:
+| TSTRUCT s = ID { String.concat "" ["struct " ; s]}
 | c = ANY s = insideptr { String.concat "" [c; s]}
 (* This is not properly capturing whitespace: it assumes there's a space between tokens, but that's not necessarily so. Need to fix lexer.  *)
 | c = ID s = insideptr { let t = if is_tyvar c then "void" else c in String.concat " " [t; s] }

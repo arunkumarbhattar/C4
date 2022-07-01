@@ -18,6 +18,7 @@
 #define tarray_ptr _TArray_ptr
 #define tnt_array_ptr _TNt_array_ptr
 #define checked _Checked
+#define tainted _Tainted
 #define nt_checked _Nt_checked
 #define unchecked _Unchecked
 #define bounds_only _Bounds_only
@@ -55,6 +56,58 @@ rule keyword = parse
 | "_TPtr" | "_TArray_ptr" | "_TNt_array_ptr" { TPTR }
 | "Tstruct" { TSTRUCT}
 | "_Checked" | "_Unchecked" | "_Nt_checked" { CHECKED }
+| "_Tainted" {TAINTED}
+(*
+        stdlib_tainted.h
+*)
+| "t_atof" {TATOF}
+| "t_atoi" {TATOI}
+| "t_atol" {TATOL}
+| "t_atoll" {TATOLL}
+| "t_strtod" {TSTRTOD}
+| "t_strtof" {TSTRTOF}
+| "t_strtold" {TSTRTOLD}
+| "t_strtol" {TSTRTOL}
+| "t_strtoll" {TSTRTOLL}
+| "t_strtoul" {TSTRTOUL}
+| "t_strtoull" {TSTRTOULL}
+| "t_aligned_alloc" {TALIGNEDALLOC}
+| "t_free" {TFREE}
+| "t_getenv" {TGETENV}
+| "t_atexit" {TATEXIT}
+| "t_atquick_exit" {TATQUICKEXIT}
+| "t_system" {TSYSTEM}
+| "t_bsearch" {TBSEARCH}
+| "t_qsort" {TQSORT}
+| "t_mblen" {TMBLEN}
+| "t_mbtowc" {TMBTOWC}
+| "t_mbstowcs" {TMBSTOWCS}
+| "t_wcstombs" {TWCSTOMBS}
+| "t_malloc" {TMALLOC}
+| "t_realloc" {TREALLOC}
+(*
+        _builtin_common_tainted.cpp
+*)
+| "__t_builtin_object_size" {TBUILTINOBJECTSIZE}
+(*
+        _builtin_stdio_tainted.h
+*)
+| "__t_builtin___sprintf_chk" {TBUILTINSPRINTFCHK}
+| "__t_snprintf_chk" {TSNPRINTFCHK}
+| "__t_builtin___snprintf_chk" {TBUILTINSNPRINTFCHK}
+| "__t_vsprintf_chk" {TVSPRINTFCHK}
+| "__t_builtin___vsprintf_chk" {TBUILTINVSPRINTFCHK}
+| "__t_vsnprintf_chk" {TVSNNPRINTFCHK}
+| "__t_builtin___vsnprintf_chk" {TBUILTINVSNPRINTFCHK}
+| "__t_fprintf_chk" {TFRINTFCHK}
+| "__t_builtin___fprintf_chk" {TBUILTINFPRINTFCHK}
+| "__t_printf_chk" {TPRINTFCHK}
+| "__t_builtin___printf_chk" {TPRINTFCHK}
+| "__t_vsprintf_chk" {TVSPRINTFCHK}
+| "__t_vfprintf_chk" {TVFPRINTFCHK}
+| "__t_builtin___vfprintf_chk" {TBUILTINVFPRINTFCHK}
+| "__t_builtin___vprintf_chk" {TBULTINVPRINTFCHK}
+
 | "_Dynamic_check" { DYNCHECK }
 | "_Assume_bounds_cast" | "_Dynamic_bounds_cast" { ASSUME_CAST }
 | "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast" { TASSUME_CAST }
