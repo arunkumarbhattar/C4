@@ -121,6 +121,9 @@ expr:
 tstruct:
 | TPTR LANGLE TSTRUCT s = tstruct RANGLE {String.concat "" ["*"; s ]}
 
+tmalloc:
+| TMALLOC LANGLE tmalloc RANGLE {  String.concat "" [""; ""] }
+
 exprcomma:
 | LPAREN e = exprcomma* RPAREN { (String.concat "" ("("::e))^")" }
 | c = ANY s = exprcomma { String.concat "" [c; s]}
@@ -144,7 +147,7 @@ annot:
 /* add INCLUDE here; remove _checked, drop stdchecked.h (and note it in lexer) */
 | CHECKED { ($startpos.pos_cnum, $endpos.pos_cnum, "") }
 | TAINTED { ($startpos.pos_cnum, $endpos.pos_cnum, "")}
-| TMALLOC { ($startpos.pos_cnum, $endpos.pos_cnum, "malloc")}
+| TMALLOC LANGLE insidebounds RANGLE { ($startpos.pos_cnum, $endpos.pos_cnum, "malloc")}
 | TSTRUCT { ($startpos.pos_cnum, $endpos.pos_cnum, "struct") }
 | TSPRINTFCHKCBX {($startpos.pos_cnum, $endpos.pos_cnum, "__sprintf_chkcbx")}
 | TPRINTF {($startpos.pos_cnum, $endpos.pos_cnum, "printf")}
@@ -162,6 +165,7 @@ fakebounds: /* I am assuming ID will be count, bounds, or byte_count */
 | ID LPAREN insidebounds+ RPAREN { None }
 
 insidebounds:
+| TSTRUCT insidebounds {None}
 | LPAREN insidebounds+ RPAREN { None }
 | checkedptr { None }
 | LANGLE { None }
@@ -191,6 +195,7 @@ checkedptr:
 | PTR LANGLE fp = fpointer RANGLE 
   { let (ret,params) = fp in String.concat "" [ret; "(*"; ")"; params] }
 | TPTR LANGLE p = checkedptr RANGLE { String.concat "" [p; " *"] }
+| TMALLOC LANGLE tmalloc RANGLE {  String.concat "" [""; ""]}
 | TPTR LANGLE s = tstruct RANGLE {String.concat "" [s; "*"]}
 | TPTR LANGLE s = insideptr RANGLE { String.concat "" [s; " *"]}
 | TPTR LANGLE fp = fpointer RANGLE name = id_or_pid

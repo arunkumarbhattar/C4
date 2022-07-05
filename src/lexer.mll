@@ -111,7 +111,7 @@ rule keyword = parse
                {
                   try
 	       		    let token = Hashtbl.find keyword_table word in
-	       		    Printf.fprintf stderr "Token being parsed: %s!\n" word;
+	       		    Printf.fprintf stderr "****************Token being parsed: %s!\n************************" word;
 	       		    token
                     with Not_found ->
                     ID word
