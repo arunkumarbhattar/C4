@@ -17,6 +17,7 @@
 #define tnt_array_ptr _TNt_array_ptr
 #define checked _Checked
 #define tainted _Tainted
+#define mirror _Mirror
 #define nt_checked _Nt_checked
 #define unchecked _Unchecked
 #define bounds_only _Bounds_only
@@ -80,6 +81,44 @@
                 ( "__t_vfprintf_chk" , TVFPRINTFCHK);
                 ( "__t_builtin___vfprintf_chk" , TBUILTINVFPRINTFCHK);
                 ( "__t_builtin___vprintf_chk" , TBULTINVPRINTFCHK);
+                ("t_frexp", TFREEXP);
+                ("t_frexpf", TFREEXPF);
+                ("t_frexpl", TFREEXPL);
+                ("t_modf", TMODF);
+                ("t_modff", TMODFF);
+                ("t_modfl", TMODFL);
+                ("t_remquo", TREMQUO);
+                ("t_remquof", TREMQUOF);
+                ("t_remquol", TREMQUOL);
+                ("t_nan", TNAN);
+                ("t_nanf", TNANF);
+                ("t_nanl", TNANL);
+                ("t_isnan", TISNAN);
+                ("t_isinf", TISINF);
+                ("_t_errno", TERRNO);
+                ("t_memcpy", TMEMCPY);
+                ("t_memmove", TMEMMOVE);
+                ("t_memset", TMEMSET);
+                ("t_strcpy", TSTRCPY);
+                ("t_strncpy", TSTRNCPY);
+                ("t_strcat", TSTRCAT);
+("t_strncat", TSTRNCAT);
+                ("t_memcmp", TMEMCMP);
+                ("t_strcmp", TSTRCMP);
+                ("t_strcoll", TSTRCOLL);
+                ("t_strncmp", TSTRNCMP);
+                ("t_strxfrm", TSTRXFRM);
+("t_memchr", TMEMCHR);
+                ("t_strchr", TSTRCHR);
+                ("t_strcspn", TSTRCSPN);
+                ("t_strpbrk", TSTRPBRK);
+                ("t_strrchr", TSTRRCHR);
+                ("t_strspn", TSTRSPN);
+                ("t_strstr", TSTRSTR);
+                ("t_strtok", TSTRTOK);
+                ("t_strerror", TSTRERROR);
+                ("t_strlen", TSTRLEN);
+                ("t_strdup", TSTRDUP);
         ]
 
 }
@@ -107,11 +146,12 @@ rule keyword = parse
 | "Tstruct" { TSTRUCT}
 | "_Checked" | "_Unchecked" | "_Nt_checked" { CHECKED }
 | "_Tainted" {TAINTED}
+| "_Mirror" {MIRROR}
 | ['_' 'A'-'Z' 'a'-'z']['_' 'A'-'Z' 'a'-'z' '0'-'9' '_']* as word
                {
                   try
 	       		    let token = Hashtbl.find keyword_table word in
-	       		    Printf.fprintf stderr "Token being parsed: %s!\n" word;
+	       		    Printf.fprintf stderr "****************Token being parsed: %s!\n************************" word;
 	       		    token
                     with Not_found ->
                     ID word
