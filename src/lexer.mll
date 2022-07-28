@@ -147,6 +147,9 @@ rule keyword = parse
 | "_Checked" | "_Unchecked" | "_Nt_checked" { CHECKED }
 | "_Tainted" {TAINTED}
 | "_Mirror" {MIRROR}
+| "t_malloc" {TMALLOC}
+| "t_free" {TFREE}
+| "t_realloc" {TREALLOC}
 | "_Dynamic_check" { DYNCHECK }
 | "_Assume_bounds_cast" | "_Dynamic_bounds_cast" | "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast" {
 ASSUME_CAST }
