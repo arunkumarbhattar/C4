@@ -157,16 +157,16 @@ rule keyword = parse
                     ID word
 		}
 | "_Dynamic_check" { DYNCHECK }
-| "_Assume_bounds_cast" | "_Dynamic_bounds_cast" { ASSUME_CAST }
-| "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast" { TASSUME_CAST }
+| "_Assume_bounds_cast" | "_Dynamic_bounds_cast" | "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast"
+{ ASSUME_CAST }
 (* Shorthands -- could limit only if !stdchecked, but won't work if not directly included *)
 | "ptr" | "array_ptr" | "nt_array_ptr" { if !stdchecked then PTR else ID(Lexing.lexeme lexbuf) }
 | "tptr" | "tarray_ptr" | "tnt_array_ptr" { if !stdcheckcbox then TPTR else ID(Lexing.lexeme lexbuf) }
 | "Tstruct" { if !stdcheckcbox then TSTRUCT else ID(Lexing.lexeme lexbuf) }
 | "checked" | "unchecked" | "nt_checked" {if !stdcheckcbox then CHECKED else ID(Lexing.lexeme lexbuf) }
 | "dynamic_check" { if !stdchecked then DYNCHECK else ID(Lexing.lexeme lexbuf) }
-| "assume_bounds_cast" | "dynamic_bounds_cast" { if !stdchecked then ASSUME_CAST else ID(Lexing.lexeme lexbuf) }
-| "tainted_assume_bounds_cast" | "tainted_dynamic_bounds_cast" { if !stdcheckcbox then TASSUME_CAST else ID(Lexing.lexeme lexbuf) }
+| "assume_bounds_cast" | "dynamic_bounds_cast" | "tainted_assume_bounds_cast" | "tainted_dynamic_bounds_cast"
+{ if !stdchecked then ASSUME_CAST else ID(Lexing.lexeme lexbuf) }
 | pid { PID(Lexing.lexeme lexbuf) }
 | id { ID(Lexing.lexeme lexbuf) }
 | "," { COMMA }
