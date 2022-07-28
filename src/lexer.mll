@@ -147,18 +147,9 @@ rule keyword = parse
 | "_Checked" | "_Unchecked" | "_Nt_checked" { CHECKED }
 | "_Tainted" {TAINTED}
 | "_Mirror" {MIRROR}
-| ['_' 'A'-'Z' 'a'-'z']['_' 'A'-'Z' 'a'-'z' '0'-'9' '_']* as word
-               {
-                  try
-	       		    let token = Hashtbl.find keyword_table word in
-	       		    Printf.fprintf stderr "****************Token being parsed: %s!\n************************" word;
-	       		    token
-                    with Not_found ->
-                    ID word
-		}
 | "_Dynamic_check" { DYNCHECK }
-| "_Assume_bounds_cast" | "_Dynamic_bounds_cast" | "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast"
-{ ASSUME_CAST }
+| "_Assume_bounds_cast" | "_Dynamic_bounds_cast" | "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast" {
+ASSUME_CAST }
 (* Shorthands -- could limit only if !stdchecked, but won't work if not directly included *)
 | "ptr" | "array_ptr" | "nt_array_ptr" { if !stdchecked then PTR else ID(Lexing.lexeme lexbuf) }
 | "tptr" | "tarray_ptr" | "tnt_array_ptr" { if !stdcheckcbox then TPTR else ID(Lexing.lexeme lexbuf) }
