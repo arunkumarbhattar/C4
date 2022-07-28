@@ -217,7 +217,7 @@ checkedptr:
 | PTR LANGLE fp = fpointer RANGLE 
   { let (ret,params) = fp in String.concat "" [ret; "(*"; ")"; params] }
 | TPTR LANGLE p = checkedptr RANGLE { String.concat "" [p; " *"] }
-| TMALLOC LANGLE tmalloc RANGLE {  String.concat "" [""; ""]}
+| TMALLOC LANGLE insidebounds RANGLE {  String.concat "" [""; ""]}
 | TPTR LANGLE s = tstruct RANGLE {String.concat "" [s; "*"]}
 | TPTR LANGLE s = insideptr RANGLE { String.concat "" [s; " *"]}
 | TPTR LANGLE fp = fpointer RANGLE name = id_or_pid
