@@ -161,6 +161,13 @@ tstruct:
 tmalloc:
 | TMALLOC LANGLE tmalloc RANGLE {  String.concat "" [""; ""] }
 
+tfree:
+| TFREE LANGLE tfree RANGLE {  String.concat "" [""; ""] }
+
+trealloc:
+| TREALLOC LANGLE trealloc RANGLE {  String.concat "" [""; ""] }
+
+
 exprcomma:
 | LPAREN e = exprcomma* RPAREN { (String.concat "" ("("::e))^")" }
 | c = ANY s = exprcomma { String.concat "" [c; s]}
@@ -198,7 +205,8 @@ annot:
 | TSTRTOUL { ($startpos.pos_cnum, $endpos.pos_cnum, "strtoul") }
 | TSTRTOULL { ($startpos.pos_cnum, $endpos.pos_cnum, "strtoull") }
 | TALIGNEDALLOC { ($startpos.pos_cnum, $endpos.pos_cnum, "aligned_alloc") }
-| TFREE { ($startpos.pos_cnum, $endpos.pos_cnum, "free") }
+| TFREE LANGLE tfree RANGLE{ ($startpos.pos_cnum, $endpos.pos_cnum, "free") }
+| TREALLOC LANGLE trealloc RANGLE { ($startpos.pos_cnum, $endpos.pos_cnum, "realloc") }
 | TGETENV { ($startpos.pos_cnum, $endpos.pos_cnum, "getenv") }
 | TATEXIT { ($startpos.pos_cnum, $endpos.pos_cnum, "atexit") }
 | TATQUICKEXIT { ($startpos.pos_cnum, $endpos.pos_cnum, "atquick_exit") }
@@ -292,7 +300,9 @@ checkedptr:
 | PTR LANGLE fp = fpointer RANGLE 
   { let (ret,params) = fp in String.concat "" [ret; "(*"; ")"; params] }
 | TPTR LANGLE p = checkedptr RANGLE { String.concat "" [p; " *"] }
-| TMALLOC LANGLE insidebounds RANGLE {  String.concat "" [""; ""]}
+| TMALLOC LANGLE insidebounds RANGLE {  String.concat "malloc" [""; ""]}
+| TFREE LANGLE insidebounds RANGLE {  String.concat "" ["free"; ""]}
+| TREALLOC LANGLE insidebounds RANGLE {  String.concat "realloc" [""; ""]}
 | TPTR LANGLE s = tstruct RANGLE {String.concat "" [s; "*"]}
 | TPTR LANGLE s = insideptr RANGLE { String.concat "" [s; " *"]}
 | TPTR LANGLE fp = fpointer RANGLE name = id_or_pid
