@@ -150,6 +150,9 @@ rule keyword = parse
 | "t_malloc" {TMALLOC}
 | "t_free" {TFREE}
 | "t_realloc" {TREALLOC}
+| "t_strlen" {TSTRLEN}
+| "t_strncmp" {TSTRNCMP}
+| "t_strchr" {TSTRCHR}
 | "_Dynamic_check" { DYNCHECK }
 | "_Assume_bounds_cast" | "_Dynamic_bounds_cast" | "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast" {
 ASSUME_CAST }
