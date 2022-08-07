@@ -50,6 +50,7 @@
                 ( "t_strtoll" , TSTRTOLL);
                 ( "t_strtoul" , TSTRTOUL);
                 ( "t_strtoull" , TSTRTOULL);
+                ("t_sprintf",TSPRINTF);
                 ( "t_aligned_alloc" , TALIGNEDALLOC);
                 ("__t_sprintf_chkcbx", TSPRINTFCHKCBX);
                 ( "t_free" , TFREE);
@@ -96,6 +97,7 @@
                 ("t_isnan", TISNAN);
                 ("t_isinf", TISINF);
                 ("_t_errno", TERRNO);
+                ("__t_errno_location", TERRNOLOCATION);
                 ("t_memcpy", TMEMCPY);
                 ("t_memmove", TMEMMOVE);
                 ("t_memset", TMEMSET);
@@ -119,6 +121,7 @@
                 ("t_strerror", TSTRERROR);
                 ("t_strlen", TSTRLEN);
                 ("t_strdup", TSTRDUP);
+                ("_Callback" , CALLBACK);
         ]
 
 }
@@ -146,6 +149,7 @@ rule keyword = parse
 | "Tstruct" { TSTRUCT}
 | "_Checked" | "_Unchecked" | "_Nt_checked" { CHECKED }
 | "_Tainted" {TAINTED}
+| "_Callback" {CALLBACK}
 | "_Mirror" {MIRROR}
 | "t_malloc" {TMALLOC}
 | "t_free" {TFREE}
@@ -153,6 +157,11 @@ rule keyword = parse
 | "t_strlen" {TSTRLEN}
 | "t_strncmp" {TSTRNCMP}
 | "t_strchr" {TSTRCHR}
+| "_t_errno" {TERRNO}
+| "__t_errno_location" {TERRNOLOCATION}
+| "t_memcpy" {TMEMCPY}
+| "t_strncpy" {TSTRNCPY}
+| "t_sprintf" {TSPRINTF}
 | "_Dynamic_check" { DYNCHECK }
 | "_Assume_bounds_cast" | "_Dynamic_bounds_cast" | "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast" {
 ASSUME_CAST }
