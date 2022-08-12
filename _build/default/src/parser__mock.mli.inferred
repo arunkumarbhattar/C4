@@ -1,0 +1,137 @@
+type token =
+    TWCSTOMBS
+  | TVSPRINTFCHK
+  | TVSNNPRINTFCHK
+  | TVFPRINTFCHK
+  | TSYSTEM
+  | TSTRXFRM
+  | TSTRUCT_str of string
+  | TSTRUCT
+  | TSTRTOULL
+  | TSTRTOUL
+  | TSTRTOLL
+  | TSTRTOLD
+  | TSTRTOL
+  | TSTRTOK
+  | TSTRTOF
+  | TSTRTOD
+  | TSTRSTR
+  | TSTRSPN
+  | TSTRRCHR
+  | TSTRPBRK
+  | TSTRNCPY
+  | TSTRNCMP
+  | TSTRNCAT
+  | TSTRLEN
+  | TSTRERROR
+  | TSTRDUP
+  | TSTRCSPN
+  | TSTRCPY
+  | TSTRCOLL
+  | TSTRCMP
+  | TSTRCHR
+  | TSTRCAT
+  | TSPRINTFCHKCBX
+  | TSNPRINTFCHK
+  | TREMQUOL
+  | TREMQUOF
+  | TREMQUO
+  | TREALLOC
+  | TQSORT
+  | TPTR
+  | TPRINTFCHK
+  | TPRINTF
+  | TNANL
+  | TNANF
+  | TNAN
+  | TMODFL
+  | TMODFF
+  | TMODF
+  | TMEMSET
+  | TMEMMOVE
+  | TMEMCPY
+  | TMEMCMP
+  | TMEMCHR
+  | TMBTOWC
+  | TMBSTOWCS
+  | TMBLEN
+  | TMALLOC
+  | TISNAN
+  | TISINF
+  | TGETENV
+  | TFRINTFCHK
+  | TFREEXPL
+  | TFREEXPF
+  | TFREEXP
+  | TFREE
+  | TERRNO
+  | TBULTINVPRINTFCHK
+  | TBUILTINVSPRINTFCHK
+  | TBUILTINVSNPRINTFCHK
+  | TBUILTINVFPRINTFCHK
+  | TBUILTINSPRINTFCHK
+  | TBUILTINSNPRINTFCHK
+  | TBUILTINPRINTFCHK
+  | TBUILTINOBJECTSIZE
+  | TBUILTINFPRINTFCHK
+  | TBSEARCH
+  | TATQUICKEXIT
+  | TATOLL
+  | TATOL
+  | TATOI
+  | TATOF
+  | TATEXIT
+  | TALIGNEDALLOC
+  | TAINTED
+  | RPAREN
+  | RANGLE
+  | PTR
+  | PRAGMA of (int * int)
+  | PID of string
+  | MIRROR
+  | LPAREN
+  | LANGLE
+  | ID of string
+  | GIJOE
+  | FORANY
+  | EOF
+  | DYNCHECK
+  | COMMA
+  | COLONITYPE of (int * int)
+  | COLONBOUNDS of (int * int)
+  | COLON
+  | CHECKED
+  | ASSUME_CAST
+  | ANY of string
+val menhir_begin_marker : int
+val xv_tstruct : string
+val xv_tmalloc : string
+val xv_separated_nonempty_list_COMMA_param_ : string list
+val xv_separated_list_COMMA_param_ : string list
+val xv_paramlist : string
+val xv_param : string
+val xv_option_paramlist_ : string option
+val xv_option_instvar_ : (int * int * string) option
+val xv_option_bounds_ : (int * int) option
+val xv_option_ID_ : string option
+val xv_nonempty_list_insidebounds_ : 'a option list
+val xv_main : (int * int * string) list
+val xv_loption_separated_nonempty_list_COMMA_param__ : string list
+val xv_list_insidebounds_ : 'a option list
+val xv_list_fakebounds_ : 'a option list
+val xv_list_exprcomma_ : string list
+val xv_itype : int * int
+val xv_instvar : int * int * string
+val xv_insideptr : string
+val xv_insideitype : string
+val xv_insidebounds : 'a option
+val xv_id_or_pid : string
+val xv_fpointer : string * string
+val xv_fakebounds : 'a option
+val xv_exprcomma : string
+val xv_expr : string
+val xv_checkedptr : string
+val xv_cast : string
+val xv_bounds : int * int
+val xv_annot : int * int * string
+val menhir_end_marker : int

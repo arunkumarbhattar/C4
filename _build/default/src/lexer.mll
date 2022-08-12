@@ -137,11 +137,11 @@ rule keyword = parse
                         Lexing.new_line lexbuf;
                         PRAGMA(start_p,end_p)  }
 | ['#']"include"[' ' '\t']*"<stdchecked.h>" { stdchecked := true; CHECKED }
-| ['#']"include"[' ' '\t']*"<stdtainted.h>" { stdcheckcbox := false; CHECKED }
+| ['#']"include"[' ' '\t']*"<stdtainted.h>" { stdcheckcbox := true; CHECKED }
 | '"' { let b = Buffer.create 17 in Buffer.add_char b '"'; read_string b lexbuf }
 | '\'' { let b = Buffer.create 17 in Buffer.add_char b '\''; read_char b lexbuf }
 | "_Itype_for_any" | "_For_any" { brace_depth := Some(0); FORANY }
-| "_Ptr" | "_Array_ptr" | "_Nt_array_ptr" { PTR }
+| "_Ptr" | "_Array_ptr" | "_Nt_array_ptr" { PTR } 
 | "_TPtr" | "_TArray_ptr" | "_TNt_array_ptr" { TPTR }
 | "Tstruct" { TSTRUCT}
 | "_Checked" | "_Unchecked" | "_Nt_checked" { CHECKED }

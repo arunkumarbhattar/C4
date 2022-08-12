@@ -57,7 +57,6 @@
 %token TMALLOC
 %token TREALLOC
 %token TSPRINTFCHKCBX
-%token TSPRINTF
 (*
         _builtin_common_tainted.cpp
 *)
@@ -94,8 +93,6 @@
 %token TISNAN
 %token TISINF
 %token TERRNO
-%token TERRNOLOCATION
-%token CALLBACK
 %token TMEMCPY
 %token TMEMMOVE
 %token TMEMSET
@@ -164,15 +161,6 @@ tstruct:
 tmalloc:
 | TMALLOC LANGLE tmalloc RANGLE {  String.concat "" [""; ""] }
 
-tfree:
-| TFREE LANGLE tfree RANGLE {  String.concat "" [""; ""] }
-
-trealloc:
-| TREALLOC LANGLE trealloc RANGLE {  String.concat "" [""; ""] }
-
-tmemcpy:
-| TMEMCPY LANGLE tmemcpy RANGLE {  String.concat "" [""; ""] }
-
 exprcomma:
 | LPAREN e = exprcomma* RPAREN { (String.concat "" ("("::e))^")" }
 | c = ANY s = exprcomma { String.concat "" [c; s]}
@@ -198,8 +186,6 @@ annot:
 | TAINTED { ($startpos.pos_cnum, $endpos.pos_cnum, "")}
 | MIRROR { ($startpos.pos_cnum, $endpos.pos_cnum, "")}
 | TMALLOC LANGLE tmalloc RANGLE { ($startpos.pos_cnum, $endpos.pos_cnum, "malloc")}
-| TMEMCPY { ($startpos.pos_cnum, $endpos.pos_cnum, "memcpy") }
-| TMEMCPY LANGLE tmemcpy RANGLE { ($startpos.pos_cnum, $endpos.pos_cnum, "memcpy") }
 | TSTRUCT { ($startpos.pos_cnum, $endpos.pos_cnum, "struct") }
 | TATOF { ($startpos.pos_cnum, $endpos.pos_cnum, "atof") }
 | TATOI { ($startpos.pos_cnum, $endpos.pos_cnum, "atoi") }
@@ -212,8 +198,7 @@ annot:
 | TSTRTOUL { ($startpos.pos_cnum, $endpos.pos_cnum, "strtoul") }
 | TSTRTOULL { ($startpos.pos_cnum, $endpos.pos_cnum, "strtoull") }
 | TALIGNEDALLOC { ($startpos.pos_cnum, $endpos.pos_cnum, "aligned_alloc") }
-| TFREE LANGLE tfree RANGLE{ ($startpos.pos_cnum, $endpos.pos_cnum, "free") }
-| TREALLOC LANGLE trealloc RANGLE { ($startpos.pos_cnum, $endpos.pos_cnum, "realloc") }
+| TFREE { ($startpos.pos_cnum, $endpos.pos_cnum, "free") }
 | TGETENV { ($startpos.pos_cnum, $endpos.pos_cnum, "getenv") }
 | TATEXIT { ($startpos.pos_cnum, $endpos.pos_cnum, "atexit") }
 | TATQUICKEXIT { ($startpos.pos_cnum, $endpos.pos_cnum, "atquick_exit") }
@@ -238,9 +223,8 @@ annot:
 | TNANL { ($startpos.pos_cnum, $endpos.pos_cnum, "nanl") }
 | TISNAN { ($startpos.pos_cnum, $endpos.pos_cnum, "isnan") }
 | TISINF { ($startpos.pos_cnum, $endpos.pos_cnum, "isinf") }
-| CALLBACK { ($startpos.pos_cnum, $endpos.pos_cnum, "") }
 | TERRNO { ($startpos.pos_cnum, $endpos.pos_cnum, "errno") }
-| TERRNOLOCATION { ($startpos.pos_cnum, $endpos.pos_cnum, "__errno_location") }
+| TMEMCPY { ($startpos.pos_cnum, $endpos.pos_cnum, "memcpy") }
 | TMEMMOVE { ($startpos.pos_cnum, $endpos.pos_cnum, "memmove") }
 | TMEMSET { ($startpos.pos_cnum, $endpos.pos_cnum, "memset") }
 | TSTRCPY { ($startpos.pos_cnum, $endpos.pos_cnum, "strcpy") }
@@ -264,7 +248,6 @@ annot:
 | TSTRLEN { ($startpos.pos_cnum, $endpos.pos_cnum, "strlen") }
 | TSTRDUP { ($startpos.pos_cnum, $endpos.pos_cnum, "strdup") }
 | TSPRINTFCHKCBX {($startpos.pos_cnum, $endpos.pos_cnum, "__sprintf_chkcbx")}
-| TSPRINTF {($startpos.pos_cnum, $endpos.pos_cnum, "sprintf")}
 | TPRINTF {($startpos.pos_cnum, $endpos.pos_cnum, "printf")}
 | p = PRAGMA { let (s,e) = p in (s, e, "") }
 | DYNCHECK LPAREN insidebounds* RPAREN { ($startpos.pos_cnum, $endpos.pos_cnum, "") }
@@ -309,10 +292,7 @@ checkedptr:
 | PTR LANGLE fp = fpointer RANGLE 
   { let (ret,params) = fp in String.concat "" [ret; "(*"; ")"; params] }
 | TPTR LANGLE p = checkedptr RANGLE { String.concat "" [p; " *"] }
-| TMALLOC LANGLE insidebounds RANGLE {  String.concat "malloc" [""; ""]}
-| TFREE LANGLE insidebounds RANGLE {  String.concat "" ["free"; ""]}
-| TREALLOC LANGLE insidebounds RANGLE {  String.concat "realloc" [""; ""]}
-| TMEMCPY LANGLE insidebounds RANGLE {  String.concat "memcpy" [""; ""]}
+| TMALLOC LANGLE insidebounds RANGLE {  String.concat "" [""; ""]}
 | TPTR LANGLE s = tstruct RANGLE {String.concat "" [s; "*"]}
 | TPTR LANGLE s = insideptr RANGLE { String.concat "" [s; " *"]}
 | TPTR LANGLE fp = fpointer RANGLE name = id_or_pid
