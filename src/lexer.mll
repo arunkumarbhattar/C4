@@ -31,7 +31,6 @@
  *)
 
   let brace_depth = ref None
-
     let create_hashtable size init =
         let tbl = Hashtbl.create size in
         List.iter (fun (key, data) -> Hashtbl.add tbl key data) init;
@@ -50,7 +49,6 @@
                 ( "t_strtoll" , TSTRTOLL);
                 ( "t_strtoul" , TSTRTOUL);
                 ( "t_strtoull" , TSTRTOULL);
-                ("t_sprintf",TSPRINTF);
                 ( "t_aligned_alloc" , TALIGNEDALLOC);
                 ("__t_sprintf_chkcbx", TSPRINTFCHKCBX);
                 ( "t_free" , TFREE);
@@ -92,12 +90,18 @@
                 ("t_remquof", TREMQUOF);
                 ("t_remquol", TREMQUOL);
                 ("t_nan", TNAN);
+                ("t_fclose", TFCLOSE);
+                ("t_fread", TFREAD);
+                ("t_fopen", TFOPEN);
+                ("t_fseek", TFSEEK);
+                ("t_ftell", TFTELL);
+                ("t_ferror", TFERROR);
+                ("t_rewind",TREWIND);
                 ("t_nanf", TNANF);
                 ("t_nanl", TNANL);
                 ("t_isnan", TISNAN);
                 ("t_isinf", TISINF);
                 ("_t_errno", TERRNO);
-                ("__t_errno_location", TERRNOLOCATION);
                 ("t_memcpy", TMEMCPY);
                 ("t_memmove", TMEMMOVE);
                 ("t_memset", TMEMSET);
@@ -121,7 +125,6 @@
                 ("t_strerror", TSTRERROR);
                 ("t_strlen", TSTRLEN);
                 ("t_strdup", TSTRDUP);
-                ("_Callback" , CALLBACK);
         ]
 
 }
@@ -151,21 +154,22 @@ rule keyword = parse
 | "_Tainted" {TAINTED}
 | "_Callback" {CALLBACK}
 | "_Mirror" {MIRROR}
-<<<<<<< HEAD
-=======
+| "_Dynamic_check" { DYNCHECK }
 | "t_malloc" {TMALLOC}
 | "t_free" {TFREE}
 | "t_realloc" {TREALLOC}
+| "t_fclose" {TFCLOSE}
+| "t_fopen" {TFOPEN}
+| "t_fread" {TFREAD}
+| "t_fseek" {TFSEEK}
+| "t_ftell" {TFTELL}
+| "_t_errno" {TERRNO}
+| "t_memcpy" {TMEMCPY}
+| "t_strncmp" {TSTRNCMP}
 | "t_strlen" {TSTRLEN}
 | "t_strncmp" {TSTRNCMP}
-| "t_strchr" {TSTRCHR}
-| "_t_errno" {TERRNO}
-| "__t_errno_location" {TERRNOLOCATION}
-| "t_memcpy" {TMEMCPY}
-| "t_strncpy" {TSTRNCPY}
 | "t_sprintf" {TSPRINTF}
->>>>>>> 619ad59dc9da21fc52184eb7cae8b8f750eeb7af
-| "_Dynamic_check" { DYNCHECK }
+| "t_strchr" {TSTRCHR}
 | "_Assume_bounds_cast" | "_Dynamic_bounds_cast" | "_Tainted_Assume_bounds_cast" | "_Tainted_Dynamic_bounds_cast" {
 ASSUME_CAST }
 (* Shorthands -- could limit only if !stdchecked, but won't work if not directly included *)
@@ -177,7 +181,14 @@ ASSUME_CAST }
 | "assume_bounds_cast" | "dynamic_bounds_cast" | "tainted_assume_bounds_cast" | "tainted_dynamic_bounds_cast"
 { if !stdchecked then ASSUME_CAST else ID(Lexing.lexeme lexbuf) }
 | pid { PID(Lexing.lexeme lexbuf) }
-| id { ID(Lexing.lexeme lexbuf) }
+| id as word
+{
+    try
+        let token = Hashtbl.find keyword_table word in
+        token
+    with Not_found ->
+        ID word
+}
 | "," { COMMA }
 | ";" { (match !brace_depth with
           Some 0 -> brace_depth := None; clear_tyvars() (* forall applied to a prototype; stop looking *)
